@@ -1,24 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+
+//Components
+import Header from "./components/Header/Header";
+import Content from "./components/Content/Content";
 
 function App() {
+  localStorage.setItem('Auth', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWZkNTFlMGY5NWUxM2Y1OWNhZjdkMzYiLCJpYXQiOjE2NDM5OTE1NTEsImV4cCI6MTY0NDAyNzU1MX0.eyDn3EYbNnhaW-kyE8IHfSSwOToWweJKTg3AHxC5rgE');
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header />
+      <Content />
+    </>
   );
 }
 
