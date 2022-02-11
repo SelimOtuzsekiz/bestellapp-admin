@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import Moment from "react-moment";
 import {
   Box,
   Collapse,
@@ -49,12 +50,19 @@ function CollapsibleContent(props) {
           {bestellung.KontaktDaten.Vorname} {bestellung.KontaktDaten.Nachname}
         </TableCell>
         <TableCell align="right">
-          {bestellung.KontaktDaten.Adresse} {bestellung.KontaktDaten.Hausnummer}
+          {bestellung.KontaktDaten.Strasse} {bestellung.KontaktDaten.Hausnummer}
+          , {bestellung.KontaktDaten.PLZ} {bestellung.KontaktDaten.Stadt}
         </TableCell>
         <TableCell align="right">
           {bestellung.KontaktDaten.Telefonnummer}
         </TableCell>
-        <TableCell align="right">TimeStamp</TableCell>
+        <TableCell align="right">
+          {bestellung.Status}
+          </TableCell>
+        <TableCell align="right">
+          <Moment format="YYYY/MM/DD HH:mm">
+            {bestellung.createdAt}</Moment>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -92,7 +100,7 @@ function CollapsibleContent(props) {
   );
 }
 
-export default function Content({status}) {
+export default function Content({ status }) {
   const [bestellungen, setBestellungen] = useState([]);
 
   useEffect(() => {
@@ -123,6 +131,7 @@ export default function Content({status}) {
               <TableCell align="right">Name</TableCell>
               <TableCell align="right">Adresse</TableCell>
               <TableCell align="right">Telefonnummer</TableCell>
+              <TableCell align="right">Status</TableCell>
               <TableCell align="right">Bestellzeitpunkt</TableCell>
             </TableRow>
           </TableHead>
