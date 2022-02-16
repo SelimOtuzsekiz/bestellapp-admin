@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import {
   Box,
   Collapse,
   IconButton,
+  MenuItem,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
-
+import Moment from "react-moment";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 
 import axios from "axios";
 import uuid from "react-uuid";
@@ -29,6 +31,63 @@ const defaultOptions = {
 function CollapsibleContent(props) {
   const { bestellung } = props;
   const [open, setOpen] = React.useState(false);
+
+  const handleCheck = (bestellung) => {
+
+    let newState = "";
+    if (bestellung.Status === "offen") {
+      newState = "in Bearbeitung";
+    }
+    if (bestellung.Status === "in Bearbeitung") {
+      newState = "abgeschlossen";
+    }
+    const getUpdateState = async () => {
+      await axios
+        .put(
+          `http://localhost:5000/bestellungen/${bestellung._id}`,
+          {
+            Status: newState,
+          },
+          {
+            headers: {
+              Authorization: localStorage.getItem("Auth"),
+            },
+          },
+        )
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+    getUpdateState();
+  };
+
+  const handleClose = () => {
+    const newState = "storniert";
+    const getUpdateState = async () => {
+      await axios
+        .put(
+          `http://localhost:5000/bestellungen/${bestellung._id}`,
+          {
+            Status: newState,
+          },
+          {
+            headers: {
+              Authorization: localStorage.getItem("Auth"),
+            },
+          },
+        )
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+    getUpdateState();
+  };
 
   return (
     <React.Fragment>
@@ -49,12 +108,24 @@ function CollapsibleContent(props) {
           {bestellung.KontaktDaten.Vorname} {bestellung.KontaktDaten.Nachname}
         </TableCell>
         <TableCell align="right">
-          {bestellung.KontaktDaten.Adresse} {bestellung.KontaktDaten.Hausnummer}
+          {bestellung.KontaktDaten.Strasse} {bestellung.KontaktDaten.Hausnummer}
+          , {bestellung.KontaktDaten.PLZ} {bestellung.KontaktDaten.Stadt}
         </TableCell>
         <TableCell align="right">
           {bestellung.KontaktDaten.Telefonnummer}
         </TableCell>
-        <TableCell align="right">TimeStamp</TableCell>
+        <TableCell align="right">{bestellung.Status}</TableCell>
+        <TableCell align="right">
+          <Moment format="YYYY/MM/DD HH:mm">{bestellung.createdAt}</Moment>
+        </TableCell>
+        <TableCell align="right">
+          <IconButton color="success" onClick={() => handleCheck(bestellung)}>
+            <CheckIcon />
+          </IconButton>
+          <IconButton color="error" onClick={ () => handleClose(bestellung)}>
+            <CloseIcon />
+          </IconButton>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -92,15 +163,21 @@ function CollapsibleContent(props) {
   );
 }
 
-export default function Content({status}) {
+export default function Content({ status }) {
   const [bestellungen, setBestellungen] = useState([]);
+  const [selectedState, setSelectedState] = useState("alles");
 
   useEffect(() => {
+    let stateString = "";
+    if (selectedState !== "alles") {
+      stateString = `?status=${selectedState}`;
+    }
     const getOrder = async () => {
       await axios
-        .get(`http://localhost:5000/bestellungen`, { ...defaultOptions })
+        .get(`http://localhost:5000/bestellungen${stateString}`, {
+          ...defaultOptions,
+        })
         .then((res) => {
-          console.log(res.data);
           setBestellungen(res.data);
         })
         .catch((err) => {
@@ -108,13 +185,41 @@ export default function Content({status}) {
         });
     };
     getOrder();
-  }, []);
+  }, [selectedState]);
+
+  const handleOnChangeState = (e) => {
+    setSelectedState(e.target.value);
+  };
 
   return (
     <div
       style={{ margin: "10px 10px 10px 10px", padding: "10px 10px 10px 10px" }}
     >
-      <TableContainer component={Paper}>
+      <Select
+        id="country-selector"
+        value={selectedState}
+        label="Country"
+        onChange={handleOnChangeState}
+        variant="outlined"
+        style={{ backgroundColor: "white" }}
+      >
+        <MenuItem key={uuid()} value="alles">
+          alles
+        </MenuItem>
+        <MenuItem key={uuid()} value="offen">
+          offen
+        </MenuItem>
+        <MenuItem key={uuid()} value="in%20Bearbeitung">
+          in Bearbeitung
+        </MenuItem>
+        <MenuItem key={uuid()} value="abgeschlossen">
+          abgeschlossen
+        </MenuItem>
+        <MenuItem key={uuid()} value="storniert">
+          storniert
+        </MenuItem>
+      </Select>
+      <TableContainer component={Paper} style={{ height: 800, width: "100%" }}>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
@@ -123,7 +228,9 @@ export default function Content({status}) {
               <TableCell align="right">Name</TableCell>
               <TableCell align="right">Adresse</TableCell>
               <TableCell align="right">Telefonnummer</TableCell>
+              <TableCell align="right">Status</TableCell>
               <TableCell align="right">Bestellzeitpunkt</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

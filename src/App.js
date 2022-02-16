@@ -1,20 +1,31 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
 
 //Components
 import Header from "./components/Header/Header";
 import Content from "./components/Content/Content";
+import Login from "./components/Login/Login";
 
 function App() {
-  localStorage.setItem('Auth', 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MWZkNTFlMGY5NWUxM2Y1OWNhZjdkMzYiLCJpYXQiOjE2NDQ0OTc2NjUsImV4cCI6MTY0NDUzMzY2NX0.K6crLrVZT-w2M4CFeUdmgyTyTdcVdKcV0iTBtUbyxC8');
+  const [status, setStatus] = useState("offen");
   
-  const[status,setStatus] = useState("offen");
-
   return (
-    <>
-      <Header />
-      <Content status={status}/>
-    </>
+    <Router>
+      <div>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/dashboard" element={<Content />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
