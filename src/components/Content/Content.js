@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
+  Card,
+  CardContent,
   Collapse,
+  Grid,
   IconButton,
   MenuItem,
   Paper,
@@ -33,7 +36,6 @@ function CollapsibleContent(props) {
   const [open, setOpen] = React.useState(false);
 
   const handleCheck = (bestellung) => {
-
     let newState = "";
     if (bestellung.Status === "offen") {
       newState = "in Bearbeitung";
@@ -52,7 +54,7 @@ function CollapsibleContent(props) {
             headers: {
               Authorization: localStorage.getItem("Auth"),
             },
-          },
+          }
         )
         .then((res) => {
           console.log(res.data);
@@ -77,7 +79,7 @@ function CollapsibleContent(props) {
             headers: {
               Authorization: localStorage.getItem("Auth"),
             },
-          },
+          }
         )
         .then((res) => {
           console.log(res.data);
@@ -89,8 +91,41 @@ function CollapsibleContent(props) {
     getUpdateState();
   };
 
+  const handleRenderButton = (bestellung) => {
+    const myButton =
+      bestellung.Status != "storniert" &&
+      bestellung.Status != "abgeschlossen" ? (
+        <>
+          <IconButton color="success" onClick={() => handleCheck(bestellung)}>
+            <CheckIcon />
+          </IconButton>
+          <IconButton color="error" onClick={() => handleClose(bestellung)}>
+            <CloseIcon />
+          </IconButton>
+        </>
+      ) : (
+        <>
+          <IconButton
+            disabled
+            color="success"
+            onClick={() => handleCheck(bestellung)}
+          >
+            <CheckIcon />
+          </IconButton>
+          <IconButton
+            disabled
+            color="error"
+            onClick={() => handleClose(bestellung)}
+          >
+            <CloseIcon />
+          </IconButton>
+        </>
+      );
+    return myButton;
+  };
+
   return (
-    <React.Fragment>
+    <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell>
           <IconButton
@@ -118,14 +153,7 @@ function CollapsibleContent(props) {
         <TableCell align="right">
           <Moment format="YYYY/MM/DD HH:mm">{bestellung.createdAt}</Moment>
         </TableCell>
-        <TableCell align="right">
-          <IconButton color="success" onClick={() => handleCheck(bestellung)}>
-            <CheckIcon />
-          </IconButton>
-          <IconButton color="error" onClick={ () => handleClose(bestellung)}>
-            <CloseIcon />
-          </IconButton>
-        </TableCell>
+        <TableCell align="right">{handleRenderButton(bestellung)}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -159,7 +187,7 @@ function CollapsibleContent(props) {
           </Collapse>
         </TableCell>
       </TableRow>
-    </React.Fragment>
+    </>
   );
 }
 
@@ -192,54 +220,63 @@ export default function Content({ status }) {
   };
 
   return (
-    <div
-      style={{ margin: "10px 10px 10px 10px", padding: "10px 10px 10px 10px" }}
-    >
-      <Select
-        id="country-selector"
-        value={selectedState}
-        label="Country"
-        onChange={handleOnChangeState}
-        variant="outlined"
-        style={{ backgroundColor: "white" }}
-      >
-        <MenuItem key={uuid()} value="alles">
-          alles
-        </MenuItem>
-        <MenuItem key={uuid()} value="offen">
-          offen
-        </MenuItem>
-        <MenuItem key={uuid()} value="in%20Bearbeitung">
-          in Bearbeitung
-        </MenuItem>
-        <MenuItem key={uuid()} value="abgeschlossen">
-          abgeschlossen
-        </MenuItem>
-        <MenuItem key={uuid()} value="storniert">
-          storniert
-        </MenuItem>
-      </Select>
-      <TableContainer component={Paper} style={{ height: 800, width: "100%" }}>
-        <Table aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCell>Bestellung</TableCell>
-              <TableCell align="right">Name</TableCell>
-              <TableCell align="right">Adresse</TableCell>
-              <TableCell align="right">Telefonnummer</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Bestellzeitpunkt</TableCell>
-              <TableCell align="right"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {bestellungen.map((bestellung) => (
-              <CollapsibleContent key={uuid()} bestellung={bestellung} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+    <Grid container spacing={2}>
+      <Grid item xs={1}></Grid>
+      <Grid item xs={10}>
+        <Card variant="outlined">
+          <CardContent>
+            <Select
+              id="country-selector"
+              value={selectedState}
+              label="Country"
+              onChange={handleOnChangeState}
+              variant="outlined"
+              style={{ backgroundColor: "white" }}
+            >
+              <MenuItem key={uuid()} value="alles">
+                alles
+              </MenuItem>
+              <MenuItem key={uuid()} value="offen">
+                offen
+              </MenuItem>
+              <MenuItem key={uuid()} value="in%20Bearbeitung">
+                in Bearbeitung
+              </MenuItem>
+              <MenuItem key={uuid()} value="abgeschlossen">
+                abgeschlossen
+              </MenuItem>
+              <MenuItem key={uuid()} value="storniert">
+                storniert
+              </MenuItem>
+            </Select>
+            <TableContainer
+              component={Paper}
+              style={{ height: 800, width: "100%" }}
+            >
+              <Table aria-label="collapsible table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell />
+                    <TableCell>Bestellung</TableCell>
+                    <TableCell align="right">Name</TableCell>
+                    <TableCell align="right">Adresse</TableCell>
+                    <TableCell align="right">Telefonnummer</TableCell>
+                    <TableCell align="right">Status</TableCell>
+                    <TableCell align="right">Bestellzeitpunkt</TableCell>
+                    <TableCell align="right"></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {bestellungen.map((bestellung) => (
+                    <CollapsibleContent key={uuid()} bestellung={bestellung} />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid item xs={1}></Grid>
+    </Grid>
   );
 }
