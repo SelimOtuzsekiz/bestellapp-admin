@@ -91,6 +91,12 @@ function CollapsibleContent(props) {
     getUpdateState();
   };
 
+  const getPrice = (price) => {
+    const newPrice =
+      price % 100 === 0 ? price / 100 + ".00€" : price / 100 + "0€";
+    return newPrice;
+  };
+
   const handleRenderButton = (bestellung) => {
     const myButton =
       bestellung.Status != "storniert" &&
@@ -149,10 +155,11 @@ function CollapsibleContent(props) {
         <TableCell align="right">
           {bestellung.KontaktDaten.Telefonnummer}
         </TableCell>
-        <TableCell align="right">{bestellung.Status}</TableCell>
         <TableCell align="right">
           <Moment format="YYYY/MM/DD HH:mm">{bestellung.createdAt}</Moment>
         </TableCell>
+        <TableCell align="right">{getPrice(bestellung.Preis)}</TableCell>
+        <TableCell align="right">{bestellung.Status}</TableCell>
         <TableCell align="right">{handleRenderButton(bestellung)}</TableCell>
       </TableRow>
       <TableRow>
@@ -164,8 +171,6 @@ function CollapsibleContent(props) {
                   <TableRow>
                     <TableCell>Produkt</TableCell>
                     <TableCell>Extras</TableCell>
-                    <TableCell>Anzahl</TableCell>
-                    <TableCell>Kommentar</TableCell>
                     <TableCell align="right">Preis</TableCell>
                   </TableRow>
                 </TableHead>
@@ -176,9 +181,9 @@ function CollapsibleContent(props) {
                         {produkt.Name}
                       </TableCell>
                       <TableCell>{produkt.Belag}</TableCell>
-                      <TableCell align="right">{produkt.Anzahl}</TableCell>
-                      <TableCell>{produkt.Kommentar}</TableCell>
-                      <TableCell align="right">{produkt.Preis}</TableCell>
+                      <TableCell align="right">
+                        {getPrice(produkt.Preis)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -191,7 +196,7 @@ function CollapsibleContent(props) {
   );
 }
 
-export default function Content({ status }) {
+export default function Content() {
   const [bestellungen, setBestellungen] = useState([]);
   const [selectedState, setSelectedState] = useState("alles");
 
@@ -261,8 +266,9 @@ export default function Content({ status }) {
                     <TableCell align="right">Name</TableCell>
                     <TableCell align="right">Adresse</TableCell>
                     <TableCell align="right">Telefonnummer</TableCell>
-                    <TableCell align="right">Status</TableCell>
                     <TableCell align="right">Bestellzeitpunkt</TableCell>
+                    <TableCell align="right">Preis</TableCell>
+                    <TableCell align="right">Status</TableCell>
                     <TableCell align="right"></TableCell>
                   </TableRow>
                 </TableHead>
